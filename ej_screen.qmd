@@ -1,0 +1,41 @@
+---
+title: "Homework 1: Map making practice"
+author: "Jaslyn Miura"
+format: html
+---
+
+library(tidyverse)
+library(sf)
+library(here)
+
+```{r}
+
+library(tidyverse)
+library(sf)
+library(here)
+
+
+# read in geodatabase of EJScreen data at the Census Block Group level
+ejscreen <- sf::st_read(here::here("data", "ejscreen","EJSCREEN_2023_BG_StatePct_with_AS_CNMI_GU_VI.gdb")) 
+
+# filter to a state you are interested in
+hawaii <- ejscreen %>%
+  dplyr::filter(ST_ABBREV == "HI") 
+
+# filter to a county you are interested in
+big_island <- ejscreen %>%
+  dplyr::filter(CNTY_NAME %in% c("Hawaii County"))
+
+# find the average values for all variables within counties
+california_counties <- aggregate(california, by = list(california$CNTY_NAME), FUN = mean)
+
+```
+
+```{r}
+
+tm_shape(hawaii, bbox = c(-160, -156, 18, 23)) +
+  tm_polygons() 
+
+```
+
+
