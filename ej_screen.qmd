@@ -25,36 +25,70 @@ seattle <- washington %>%
 # find the average values for all variables within counties
 wa_counties <- aggregate(washington, by = list(washington$CNTY_NAME), FUN = mean)
 
+seattle_counties <- aggregate(seattle, by = list(seattle$CNTY_NAME), FUN = mean)
 
 ```
 
 
 ```{r}
 
-tm_shape(wa_counties) +
+# creating map 1
+
+tm_shape(wa_counties, bbox = c(-126, 45.5, -117, 49)) +
   tm_polygons(
     fill = "LOWINCPCT",
     fill.scale = tm_scale(values = "YlGn"),
-    fill.legend = tm_legend(title = "Low Income")) +
-  tm_title(text = "Washington State Low Income Percentages by County") +
-  tm_scale_bar() +
-  tm_compass(position = c("left", "bottom"))
-
-
+    fill.legend = tm_legend(title = "Low Income\nProportions")) +
+  tm_title(text = "Washington State Low Income Proportions, by County",
+           fontface = "bold") +
+  tm_compass(position = c("left", "bottom"),
+             type = "8star",
+             size = 3) +
+  tm_scale_bar(position = c("left", "bottom")) +
+  tm_components(c("tm_compass", "tm_scalebar"),
+                position = c("left", "bottom"))
+  
 ```
+
+The above map displays the average proportion of low income of each county. TALK ABOUT HOW THE LOW INCOME WAS CALCULATED ACCORDING TO THE READ ME. ALSO NOTE THE PROPORTIONS AND HOW THEY MAKE SENSE LIKE AN ENTIRE COUNTY WILL NOT = 1.
 
 ```{r}
 
-tm_shape(wa_counties) +
+# creating map 2
+
+tm_shape(wa_counties, bbox = c(-126, 45.5, -117, 49)) +
   tm_polygons(
     fill = "D2_UST",
     fill.scale = tm_scale(values = "YlGn"),
-    fill.legend = tm_legend(title = "Number of USTs")) +
-  tm_title(text = "Average number of LUSTs leaking underground storage tanks")
+    fill.legend = tm_legend(title = "Average Number\nof LUSTs")) +
+  tm_title(text = "Average number of leaking, underground storage tanks (LUSTs)",
+           fontface = "bold") +
+  tm_compass(type = "8star", 
+             size = 3) +
+  tm_scale_bar() +
+  tm_components(c("tm_compass", "tm_scalebar"),
+                position = c("left", "bottom"))
+
+```
+
+Why this makes sense
+- it is common for low income/minority communities to experience enviromental injustices i.e. more average number of LUSTs
+- why might we have missing data - the grey area is where washington's population is concentrated, this is where the city is 
+  - along the coast is where the Olympic National Park is, a protected area, where we would not expect there to be LUSTs.
+
+```{r}
+## testing other variables
+tm_shape(wa_counties) +
+  tm_polygons(
+    fill = "PWDIS",
+    fill.scale = tm_scale(values = "YlGn"),
+    fill.legend = tm_legend(title = "Particulate Matter")) +
+  tm_title(text = "Pm 2.5")
 
 ```
 
 ```{r}
-
+tm_shape(seattle) + 
+  tm_polygons()
 ```
 
