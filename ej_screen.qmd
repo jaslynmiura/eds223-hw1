@@ -2,10 +2,21 @@
 title: "Homework 1: Map making practice"
 author: "Jaslyn Miura"
 format: html
+warning: false
+message: false
 ---
 
+# Comparing Low Income and Potential Exposure to PM 2.5 in Washington
+
+Objective: Using census data to understand an EJScreen defined socioeconomic and environmental indicator and their relationship to each other, in Washington State at the county level.
+
+To understand the extent of environmental justices issues in the state of Washington, the proportion of low income and the potential exposure of PM 2.5 levels were selected for this analysis.
+
+### Loading in libraries, data, and data cleaning
 
 ```{r}
+
+# loading the required packages
 library(tidyverse)
 library(sf)
 library(here)
@@ -14,81 +25,71 @@ library(tmap)
 # read in geodatabase of EJScreen data at the Census Block Group level
 ejscreen <- sf::st_read(here::here("data", "ejscreen","EJSCREEN_2023_BG_StatePct_with_AS_CNMI_GU_VI.gdb")) 
 
-# filter to a state you are interested in
+# filter the ejscreen data set to Washington state
 washington <- ejscreen %>%
   dplyr::filter(ST_ABBREV == "WA") 
 
-# filter to a county you are interested in
+# filter washington to King County which represents Seattle
 seattle <- washington %>%
   dplyr::filter(CNTY_NAME %in% c("King County"))
 
 # find the average values for all variables within counties
-wa_counties <- aggregate(washington, by = list(washington$CNTY_NAME), FUN = mean)
-
-seattle_counties <- aggregate(seattle, by = list(seattle$CNTY_NAME), FUN = mean)
+wa_counties <- aggregate(washington, by = list(washington$CNTY_NAME), FUN = mean, na.rm = TRUE)
 
 ```
 
+### Creating Map 1 
 
 ```{r}
 
-# creating map 1
+# using wa_counties to map low income proportions
 
 tm_shape(wa_counties, bbox = c(-126, 45.5, -117, 49)) +
   tm_polygons(
     fill = "LOWINCPCT",
-    fill.scale = tm_scale(values = "YlGn"),
+    fill.scale = tm_scale(values = "brewer.yl_gn"),
     fill.legend = tm_legend(title = "Low Income\nProportions")) +
   tm_title(text = "Washington State Low Income Proportions, by County",
            fontface = "bold") +
   tm_compass(position = c("left", "bottom"),
              type = "8star",
              size = 3) +
-  tm_scale_bar(position = c("left", "bottom")) +
+  tm_scalebar(position = c("left", "bottom")) +
   tm_components(c("tm_compass", "tm_scalebar"),
                 position = c("left", "bottom"))
   
 ```
 
-The above map displays the average proportion of low income of each county. TALK ABOUT HOW THE LOW INCOME WAS CALCULATED ACCORDING TO THE READ ME. ALSO NOTE THE PROPORTIONS AND HOW THEY MAKE SENSE LIKE AN ENTIRE COUNTY WILL NOT = 1.
+**Interpretation:** The above map displays the average proportion of low income of each county in Washington state. According to the *EJScreen Technical Documentation for Version 2.2*, low income is defined when a household's income is less than or equal to twice the federal "poverty-level" (EPA, 2023). From the map we can see that there is a spread of low income proportions across the state. The three counties colored the lightest shade of green, indicates a low income proportion of 0.15-0.19. Which is likely due to these counties containing the state's largest populated cities, such as Seattle and Tacoma.
+
+### Creating Map 2
 
 ```{r}
 
-# creating map 2
+# using wa_counties to map potential PM 2.5 exposure levels
 
-tm_shape(wa_counties, bbox = c(-126, 45.5, -117, 49)) +
+tm_shape(wa_counties, bbox = c(-126, 45.3, -117, 49)) +
   tm_polygons(
-    fill = "D2_UST",
-    fill.scale = tm_scale(values = "YlGn"),
-    fill.legend = tm_legend(title = "Average Number\nof LUSTs")) +
-  tm_title(text = "Average number of leaking, underground storage tanks (LUSTs)",
+    fill = "D2_PM25",
+    fill.scale = tm_scale(values = "brewer.yl_gn"),
+    fill.legend = tm_legend(title = "Potential PM 2.5\nExposure Levels")) +
+  tm_title(text = "Levels of Potential Exposure of PM 2.5 Washington, by County",
            fontface = "bold") +
+  tm_credits(text = "NA values dropped in the aggregation of the counties.",
+             position = c("right", "bottom"),
+             size = 0.4,
+             fontface = "italic") +
   tm_compass(type = "8star", 
              size = 3) +
-  tm_scale_bar() +
+  tm_scalebar() +
   tm_components(c("tm_compass", "tm_scalebar"),
-                position = c("left", "bottom"))
-
+                position = c("left", "bottom")) 
 ```
 
-Why this makes sense
-- it is common for low income/minority communities to experience enviromental injustices i.e. more average number of LUSTs
-- why might we have missing data - the grey area is where washington's population is concentrated, this is where the city is 
-  - along the coast is where the Olympic National Park is, a protected area, where we would not expect there to be LUSTs.
+**Interpretation:** From the EJScreen data set, PM 2.5 was measured by taking an annual average (EPA, 2023). For our map, each county is assigned a potential PM 2.5 Exposure Level, which was done by using the aggregation function to find the average value of the PM 2.5 EJ Index. To use this function, NA values were dropped. In comparison to our previous map, we see that some counties with the highest proportions of low income also experience the highest Potential PM 2.5 Exposure Levels. The counties with low proportions of low income, which we noted contains Washington's largely populated cities (Seattle and Tacoma) experience moderate Potential PM 2.5 Exposure Levels. Many counties that were determined to have moderately to moderately high proportions of low income, experience the lowest levels of Potential PM 2.5 Exposure Levels, denoted by the lightest shade of green.
 
-```{r}
-## testing other variables
-tm_shape(wa_counties) +
-  tm_polygons(
-    fill = "PWDIS",
-    fill.scale = tm_scale(values = "YlGn"),
-    fill.legend = tm_legend(title = "Particulate Matter")) +
-  tm_title(text = "Pm 2.5")
+### **Citation**: 
 
-```
+U.S. Environmental Protection Agency (EPA), 2023. EJScreen Technical Documentation.
 
-```{r}
-tm_shape(seattle) + 
-  tm_polygons()
-```
-
+United States Environmental Protection Agency. 2015. EJSCREEN. Retrieved: October, 6, 2025, <https://19january2017snapshot.epa.gov/ejscreen/download-ejscreen-data_.html>
