@@ -1,7 +1,7 @@
 ---
 title: "Homework 1: Map making practice"
 author: "Jaslyn Miura"
-format: html
+format: pdf
 warning: false
 message: false
 ---
@@ -23,7 +23,8 @@ library(here)
 library(tmap)
 
 # read in geodatabase of EJScreen data at the Census Block Group level
-ejscreen <- sf::st_read(here::here("data", "ejscreen","EJSCREEN_2023_BG_StatePct_with_AS_CNMI_GU_VI.gdb")) 
+ejscreen <- sf::st_read(here::here(
+  "data", "ejscreen","EJSCREEN_2023_BG_StatePct_with_AS_CNMI_GU_VI.gdb")) 
 
 # filter the ejscreen data set to Washington state
 washington <- ejscreen %>%
@@ -34,7 +35,9 @@ seattle <- washington %>%
   dplyr::filter(CNTY_NAME %in% c("King County"))
 
 # find the average values for all variables within counties
-wa_counties <- aggregate(washington, by = list(washington$CNTY_NAME), FUN = mean, na.rm = TRUE)
+wa_counties <- aggregate(washington, by = list(washington$CNTY_NAME), 
+                         FUN = mean, 
+                         na.rm = TRUE)
 
 ```
 
