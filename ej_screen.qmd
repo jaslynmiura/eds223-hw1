@@ -1,6 +1,7 @@
 ---
 title: "Homework 1: Map making practice"
 author: "Jaslyn Miura"
+date: October 6, 2025
 format: pdf
 warning: false
 message: false
@@ -14,13 +15,17 @@ To understand the extent of environmental justices issues in the state of Washin
 
 ### Loading in libraries, data, and data cleaning
 
-```{r}
+```{r, echo=FALSE}
 
 # loading the required packages
 library(tidyverse)
 library(sf)
 library(here)
 library(tmap)
+```
+
+
+``` {r}
 
 # read in geodatabase of EJScreen data at the Census Block Group level
 ejscreen <- sf::st_read(here::here(
